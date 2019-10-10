@@ -20,45 +20,20 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	dbv1beta1 "github.com/eggsbenjamin/k8s_controller_experiment/api/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // CassandraClusterReconciler reconciles a CassandraCluster object
 type CassandraClusterReconciler struct {
 	client.Client
-	Log          logr.Logger
-	handlerFuncs map[string]CassandraClusterHandlerFunc
-}
-
-// +kubebuilder:rbac:groups=db.k8s.io,resources=cassandraclusters,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=db.k8s.io,resources=cassandraclusters/status,verbs=get;update;patch
-func (r *CassandraClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("cassandracluster", req.NamespacedName)
-
-	// your logic here
-
-	return ctrl.Result{}, nil
-}
-
-func (r *CassandraClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		For(&dbv1beta1.CassandraCluster{}).
-		Complete(r)
-}
-
-type CassandraClusterHandlerFunc func(context.Context, dbv1beta1.CassandraCluster) error
-
-// RegisterHandler registers a handler function with an action
-func (r *CassandraClusterReconciler) RegisterHandler(actionName string, handlerFunc CassandraClusterHandlerFunc) {
-	if r.handlerFuncs == nil {
-		r.handlerFuncs = map[string]CassandraClusterHandlerFunc{}
-	}
-	r.handlerFuncs[actionName] = handlerFunc
+	Log              logr.Logger
+	actionIdentifier ActionIdentifier
 }
 
 /*
@@ -67,6 +42,39 @@ func (r *CassandraClusterReconciler) RegisterHandler(actionName string, handlerF
 	- return meaningful identifier for this action corresponding to the delta
 	- look up appropriate action, handler, using this identifier
 */
+
+// +kubebuilder:rbac:groups=db.k8s.io,resources=cassandraclusters,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=db.k8s.io,resources=cassandraclusters/status,verbs=get;update;patch
+func (r *CassandraClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	_ = context.Background()
+	_ = r.Log.WithValues("cassandracluster", req.NamespacedName)
+
+	cassandraCluster := &dbv1beta1.CassandraCluster{}
+	if err := r.Get(context.TODO(), types.NamespacedName{}, cassandraCluster); err != nil {
+		if k8serrors.IsNotFound(err) {
+			return ctrl.Result{}, nil // deleted
+		}
+
+		return ctrl.Result{}, err
+	}
+
+	action, err := r.actionIdentifier.IdentifyAction(cassandraCluster)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if action != nil {
+		return ctrl.Result{}, action.Execute()
+	}
+
+	return ctrl.Result{}, nil // no action to take
+}
+
+func (r *CassandraClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&dbv1beta1.CassandraCluster{}).
+		Complete(r)
+}
 
 type AddCassandraNode struct {
 	cassandraCluster *dbv1beta1.CassandraCluster
