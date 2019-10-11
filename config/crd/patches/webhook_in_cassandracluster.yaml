@@ -4,7 +4,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     certmanager.k8s.io/inject-ca-from: $(NAMESPACE)/$(CERTIFICATENAME)
-  name: cassandraclusters.db.k8s.io
+  name: redisclusters.db.k8s.io
 spec:
   conversion:
     strategy: Webhook
@@ -15,4 +15,4 @@ spec:
       service:
         namespace: $(NAMESPACE)
         name: webhook-service
-        path: /convert-cassandracluster
+        path: /convert-rediscluster

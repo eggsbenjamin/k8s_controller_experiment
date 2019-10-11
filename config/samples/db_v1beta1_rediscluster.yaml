@@ -1,7 +1,7 @@
 apiVersion: db.k8s.io/v1beta1
-kind: CassandraCluster
+kind: RedisCluster
 metadata:
-  name: cassandracluster-sample
+  name: rediscluster-sample
 spec:
   # Add fields here
   foo: bar

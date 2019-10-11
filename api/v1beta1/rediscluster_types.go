@@ -19,45 +19,45 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type CassandraNodeSpec struct {
+type RedisNodeSpec struct {
 	DiskSize int `json:"diskSize,omitempty"`
 }
 
-type CassandraNodeStatus struct {
+type RedisNodeStatus struct {
 	IP       string `json:"ip,omitempty"`
 	DiskSize int    `json:"diskSize,omitempty"`
 }
 
-// CassandraClusterSpec defines the desired state of CassandraCluster
-type CassandraClusterSpec struct {
-	Nodes []CassandraNodeSpec `json:"nodes,omitempty"`
+// RedisClusterSpec defines the desired state of RedisCluster
+type RedisClusterSpec struct {
+	Nodes []RedisNodeSpec `json:"nodes,omitempty"`
 }
 
-// CassandraClusterStatus defines the observed state of CassandraCluster
-type CassandraClusterStatus struct {
-	Nodes []CassandraNodeStatus `json:"nodes,omitempty"`
+// RedisClusterStatus defines the observed state of RedisCluster
+type RedisClusterStatus struct {
+	Nodes []RedisNodeStatus `json:"nodes,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// CassandraCluster is the Schema for the cassandraclusters API
-type CassandraCluster struct {
+// RedisCluster is the Schema for the redisclusters API
+type RedisCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CassandraClusterSpec   `json:"spec,omitempty"`
-	Status CassandraClusterStatus `json:"status,omitempty"`
+	Spec   RedisClusterSpec   `json:"spec,omitempty"`
+	Status RedisClusterStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// CassandraClusterList contains a list of CassandraCluster
-type CassandraClusterList struct {
+// RedisClusterList contains a list of RedisCluster
+type RedisClusterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []CassandraCluster `json:"items"`
+	Items           []RedisCluster `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&CassandraCluster{}, &CassandraClusterList{})
+	SchemeBuilder.Register(&RedisCluster{}, &RedisClusterList{})
 }

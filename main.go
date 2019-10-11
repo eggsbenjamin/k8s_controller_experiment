@@ -53,20 +53,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = (&controllers.CassandraClusterReconciler{
+	err = (&controllers.RedisClusterReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("CassandraCluster"),
+		Log:    ctrl.Log.WithName("controllers").WithName("RedisCluster"),
 	}).SetupWithManager(mgr)
 	if err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "CassandraCluster")
+		setupLog.Error(err, "unable to create controller", "controller", "RedisCluster")
 		os.Exit(1)
 	}
-	err = (&controllers.CassandraClusterReconciler{
+	err = (&controllers.RedisClusterReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("CassandraCluster"),
+		Log:    ctrl.Log.WithName("controllers").WithName("RedisCluster"),
 	}).SetupWithManager(mgr)
 	if err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "CassandraCluster")
+		setupLog.Error(err, "unable to create controller", "controller", "RedisCluster")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

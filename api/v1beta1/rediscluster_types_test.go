@@ -29,10 +29,10 @@ import (
 // These tests are written in BDD-style using Ginkgo framework. Refer to
 // http://onsi.github.io/ginkgo to learn more.
 
-var _ = Describe("CassandraCluster", func() {
+var _ = Describe("RedisCluster", func() {
 	var (
 		key              types.NamespacedName
-		created, fetched *CassandraCluster
+		created, fetched *RedisCluster
 	)
 
 	BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("CassandraCluster", func() {
 				Name:      "foo",
 				Namespace: "default",
 			}
-			created = &CassandraCluster{
+			created = &RedisCluster{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "foo",
 					Namespace: "default",
@@ -64,7 +64,7 @@ var _ = Describe("CassandraCluster", func() {
 			By("creating an API obj")
 			Expect(k8sClient.Create(context.TODO(), created)).To(Succeed())
 
-			fetched = &CassandraCluster{}
+			fetched = &RedisCluster{}
 			Expect(k8sClient.Get(context.TODO(), key, fetched)).To(Succeed())
 			Expect(fetched).To(Equal(created))
 
